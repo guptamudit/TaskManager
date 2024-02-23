@@ -1,4 +1,4 @@
-# Task management tool: 
+# Task Management Tool: 
  - Login/Register to the application.
  -  Add daily tasks.
  -  Assign a due date of completion.
