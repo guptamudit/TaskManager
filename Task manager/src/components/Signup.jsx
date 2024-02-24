@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Signup = () => {
   return (
@@ -67,12 +68,12 @@ const Signup = () => {
               </button>
               <p class="text-sm font-light text-blue-500 ">
                 Already have an account?{" "}
-                <a
-                  href="#"
+                <Link
+                  to="/"
                   class="font-medium text-primary-600 hover:underline "
                 >
                   Sign in
-                </a>
+                </Link>
               </p>
             </form>
           </div>
@@ -81,3 +82,5 @@ const Signup = () => {
     </section>
   );
 };
+
+export default Signup;
