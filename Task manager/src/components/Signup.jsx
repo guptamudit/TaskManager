@@ -1,7 +1,43 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { auth } from "../Firebase/Firebase";
 
 const Signup = () => {
+  const [values, setValues] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const Navigate = useNavigate();
+  const [errormsg, setErrormsg] = useState("");
+  const [SubmitButtonDisabled, setSubmitButtonDisabled] = useState(false);
+
+  const handleSubmit = () => {
+    if (!values.name || !values.email || !values.password) {
+      setErrormsg("Fill all fields");
+      return;
+    }
+    setErrormsg("");
+    setSubmitButtonDisabled(true);
+    createUserWithEmailAndPassword(auth, values.email, values.password)
+      .then(async (res) => {
+        setSubmitButtonDisabled(false);
+        alert("Succesfully Signed up");
+        const user = res.user;
+        await updateProfile(user, {
+          displayName: values.name,
+        });
+        Navigate("/Home");
+        // console.log(user);
+      })
+      .catch((err) => {
+        setSubmitButtonDisabled(false);
+        setErrormsg(err.message);
+      });
+  };
+
   return (
     <section class="bg-gray-50 ">
       <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0 bg-blue-200">
@@ -24,7 +60,12 @@ const Signup = () => {
                   id="name"
                   class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
                   placeholder="John Doe"
-                  required=""
+                  onChange={(event) =>
+                    setValues((prev) => ({
+                      ...prev,
+                      name: event.target.value,
+                    }))
+                  }
                 />
               </div>
               <div>
@@ -40,7 +81,12 @@ const Signup = () => {
                   id="email"
                   class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
                   placeholder="name@company.com"
-                  required=""
+                  onChange={(event) =>
+                    setValues((prev) => ({
+                      ...prev,
+                      email: event.target.value,
+                    }))
+                  }
                 />
               </div>
               <div>
@@ -56,13 +102,24 @@ const Signup = () => {
                   id="password"
                   placeholder="••••••••"
                   class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
-                  required=""
+                  onChange={(event) =>
+                    setValues((prev) => ({
+                      ...prev,
+                      password: event.target.value,
+                    }))
+                  }
                 />
               </div>
 
+              <b className="text-sm font-extrabold  text-red-600 flex justify-center">
+                {errormsg}
+              </b>
+
               <button
-                type="submit"
-                class="w-full text-white bg-blue-400 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
+                disabled={SubmitButtonDisabled}
+                onClick={handleSubmit}
+                type="button"
+                class="w-full disabled:bg-gray-500 text-white bg-blue-400 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
               >
                 Sign up
               </button>

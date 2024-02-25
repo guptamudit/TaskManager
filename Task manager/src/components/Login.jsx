@@ -1,7 +1,39 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { auth } from "../Firebase/Firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const Login = () => {
+  const [values, setValues] = useState({
+    email: "",
+    password: "",
+  });
+
+  const Navigate = useNavigate();
+  const [errormsg, setErrormsg] = useState("");
+  const [SubmitButtonDisabled, setSubmitButtonDisabled] = useState(false);
+
+  const handleSubmit = () => {
+    if (!values.email || !values.password) {
+      setErrormsg("Fill all fields");
+      return;
+    }
+    setErrormsg("");
+    setSubmitButtonDisabled(true);
+    signInWithEmailAndPassword(auth, values.email, values.password)
+      .then(async (res) => {
+        setSubmitButtonDisabled(false);
+        alert("Succesfully Signed up");
+
+        Navigate("/Home");
+        // console.log(user);
+      })
+      .catch((err) => {
+        setSubmitButtonDisabled(false);
+        setErrormsg(err.message);
+      });
+  };
+
   return (
     <section class="bg-gray-50 ">
       <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0 bg-blue-200">
@@ -19,6 +51,12 @@ const Login = () => {
                   Your email
                 </label>
                 <input
+                  onChange={(event) =>
+                    setValues((prev) => ({
+                      ...prev,
+                      email: event.target.value,
+                    }))
+                  }
                   type="email"
                   name="email"
                   id="email"
@@ -35,6 +73,12 @@ const Login = () => {
                   Password
                 </label>
                 <input
+                  onChange={(event) =>
+                    setValues((prev) => ({
+                      ...prev,
+                      password: event.target.value,
+                    }))
+                  }
                   type="password"
                   name="password"
                   id="password"
@@ -43,9 +87,13 @@ const Login = () => {
                   required=""
                 />
               </div>
-
+              <b className="text-sm font-extrabold  text-red-600 flex justify-center">
+                {errormsg}
+              </b>
               <button
-                type="submit"
+                disabled={SubmitButtonDisabled}
+                onClick={handleSubmit}
+                type="button"
                 class="w-full text-white bg-blue-400 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
               >
                 Sign in

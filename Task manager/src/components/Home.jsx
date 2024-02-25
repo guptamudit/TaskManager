@@ -1,7 +1,10 @@
+import { signOut } from "firebase/auth";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { auth } from "../Firebase/Firebase";
 
 const Home = () => {
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -31,6 +34,18 @@ const Home = () => {
     setTasks(updatedTasks);
   };
 
+  const handleSub = (e) => {
+    e.preventDefault();
+    signOut(auth)
+      .then(() => {
+        alert("Signed out successfully");
+      })
+      .catch((error) => {
+        console.error("Error signing out:", error);
+      });
+    navigate("/");
+  };
+
   return (
     <>
       <nav className="relative flex items-center justify-around h-14 bg-blue-100 text-black px-4">
@@ -38,7 +53,7 @@ const Home = () => {
           <h1 className="text-4xl font-bold">Task Manager</h1>
         </div>
       </nav>
-      <div className="bg-blue-100 h-screen px-4 py-8">
+      <div className="bg-blue-100 min-h-screen px-4 py-8">
         <form
           className="flex items-center justify-center mb-8"
           onSubmit={addTask}
@@ -59,7 +74,11 @@ const Home = () => {
           <button className="bg-blue-600 p-2 rounded-lg text-white hover:bg-blue-700 transition-colors">
             Add Task
           </button>
-          <button className="bg-red-500 p-2 ml-2 rounded-lg text-white hover:bg-blue-700 transition-colors">
+
+          <button
+            onClick={handleSub}
+            className="bg-red-500 p-2 ml-2 rounded-lg text-white "
+          >
             Logout
           </button>
         </form>
